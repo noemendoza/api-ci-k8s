@@ -5,7 +5,7 @@
 
 version: 2
 jobs:
-  build:
+  Test:
     docker:
       - image: circleci/node:10.24.1
     working_directory: ~/repo
@@ -135,6 +135,7 @@ workflows:
   version: 2
   Test-Build-Publish:
     jobs:
+      - Test
       #- build
       # - make_build_docker:
       #     requires:
