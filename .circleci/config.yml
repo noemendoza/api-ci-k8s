@@ -1,31 +1,30 @@
+# Test CircleCI/ARGOCD/Harbor/HELM/K8S
+# Noe
+# Test porpuses
 
 
-
+version: 2
 jobs:
-  # build:
-  #   docker:
+  build:
+    docker:
+      - image: circleci/node:10.24.1
+    working_directory: ~/repo
 
-  #     - image: circleci/node:10.24.1
+    steps:
+      - checkout
+    # Download and cache dependencies
+      - restore_cache:
+           keys:
+             - v1-dependencies-{{ checksum "package.json" }}
+             - v1-dependencies-
+      - run: yarn install
 
-  #   working_directory: ~/repo
-
-  #   steps:
-  #     - checkout
-
-  #     # Download and cache dependencies
-  #     - restore_cache:
-  #         keys:
-  #           - v1-dependencies-{{ checksum "package.json" }}
-  #           - v1-dependencies-
-
-  #     - run: yarn install
-
-  #     - save_cache:
-  #         paths:
-  #           - node_modules
-  #         key: v1-dependencies-{{ checksum "package.json" }}
+      - save_cache:
+           paths:
+             - node_modules
+           key: v1-dependencies-{{ checksum "package.json" }}
      # run tests!
-      #- run: yarn test
+      - run: yarn test
  
   # make_build_docker:
   #   docker:
@@ -93,62 +92,54 @@ jobs:
       # run tests!
       #- run: yarn test
  
-  deploy_to_server:
-    machine:
-      image: ubuntu-2004:202010-01
-    steps:
-      - run:
-          name: Install OpenFortiVPN
-          command: |
-            sudo apt-get update
-            sudo apt install openfortivpn -y
- #     - run: sudo apt-get install rsync
-#      - add_ssh_keys
-      - checkout
-      - run:
-          name: "Setting environment vars for test env"
-          command: |
-                    echo "export VPN_IP=${VAR_PRIVATE_VPN_IP}" >> ${BASH_ENV}
-                    echo "export VPN_USER=${VAR_PRIVATE_VPN_USER}" >> ${BASH_ENV}
-                    echo "export VPN_PORT=${VAR_PRIVATE_VPN_PORT}" >> ${BASH_ENV}
-                    echo "export VPN_PASS=${VAR_PRIVATE_VPN_PASSWORD}" >> ${BASH_ENV}
-      - run:
-          name: Check IP before VPN connection
-          command: |
-            chmod +x .circleci/script.sh
-            ./.circleci/script.sh
-            ping -c 9 $SSH_HOSTNAME
-   #        sudo openfortivpn ${VAR_PRIVATE_VPN_IP} -u ${VAR_PRIVATE_VPN_USER} --trusted-cert 1316d13a7122725ecc1d555895053bd1ae8b0c2159e04a1c7c39e4bfb72cbfae -p ${VAR_PRIVATE_VPN_PASSWORD}   > openfortivpn.log 2>&1
-      # Add the server to known hosts
-      - run:
-          name: Test ping for remote server
-          command: |
-            ping -c 4 $SSH_HOSTNAME
-      - run: 
-          name: Sync SSH keys
-          command: |
-            ssh-keyscan -H 10.0.13.10 >> ~/.ssh/known_hosts
-      - run:
-          name: RsyncProject test
-          command: |
-           rsync -avce ssh $SSH_USERNAME@$SSH_HOSTNAME:/home/$FIOLDER/apps/test
-#  #     - run:
- #         name: Deploy to dev.
- #         command: ssh $SSH_USERNAME@$SSH_HOSTNAME -o StrictHostKeyChecking=no "ls"
- 
+  # deploy_to_server:
+  #   machine:
+  #     image: ubuntu-2004:202010-01
+  #   steps:
+  #     - run:
+  #         name: Install OpenFortiVPN
+  #         command: |
+  #           sudo apt-get update
+  #           sudo apt install openfortivpn -y
+  #     - checkout
+  #     - run:
+  #         name: "Setting environment vars for test env"
+  #         command: |
+  #                   echo "export VPN_IP=${VAR_PRIVATE_VPN_IP}" >> ${BASH_ENV}
+  #                   echo "export VPN_USER=${VAR_PRIVATE_VPN_USER}" >> ${BASH_ENV}
+  #                   echo "export VPN_PORT=${VAR_PRIVATE_VPN_PORT}" >> ${BASH_ENV}
+  #                   echo "export VPN_PASS=${VAR_PRIVATE_VPN_PASSWORD}" >> ${BASH_ENV}
+  #     - run:
+  #         name: Check IP before VPN connection
+  #         command: |
+  #           chmod +x .circleci/script.sh
+  #           ./.circleci/script.sh
+  #           ping -c 9 $SSH_HOSTNAME
 
+  #     - run:
+  #         name: Test ping for remote server
+  #         command: |
+  #           ping -c 4 $SSH_HOSTNAME
+  #     - run: 
+  #         name: Sync SSH keys
+  #         command: |
+  #           ssh-keyscan -H 10.0.13.10 >> ~/.ssh/known_hosts
+  #     - run:
+  #         name: RsyncProject test
+  #         command: |
+  #          rsync -avce ssh $SSH_USERNAME@$SSH_HOSTNAME:/home/$FIOLDER/apps/test
 
 
  
 workflows:
   version: 2
-  build-test-and-deploy:
+  Test-Build-Publish:
     jobs:
       #- build
       # - make_build_docker:
       #     requires:
       #       - build
-      - deploy_to_server
+      #- deploy_to_server
       #    requires:
       #      - build
       #- deploy_testing:
