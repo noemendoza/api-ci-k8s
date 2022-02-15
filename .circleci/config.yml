@@ -1,0 +1,162 @@
+
+
+
+jobs:
+  # build:
+  #   docker:
+
+  #     - image: circleci/node:10.24.1
+
+  #   working_directory: ~/repo
+
+  #   steps:
+  #     - checkout
+
+  #     # Download and cache dependencies
+  #     - restore_cache:
+  #         keys:
+  #           - v1-dependencies-{{ checksum "package.json" }}
+  #           - v1-dependencies-
+
+  #     - run: yarn install
+
+  #     - save_cache:
+  #         paths:
+  #           - node_modules
+  #         key: v1-dependencies-{{ checksum "package.json" }}
+     # run tests!
+      #- run: yarn test
+ 
+  # make_build_docker:
+  #   docker:
+    
+  #     - image: circleci/node:10.24.1
+    
+
+  #   working_directory: ~/repo
+
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Install `docker-compose`
+  #         command: |
+  #           curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+  #           chmod +x ~/docker-compose
+  #           sudo mv ~/docker-compose /usr/local/bin/docker-compose
+  #     - setup_remote_docker:
+  #         docker_layer_caching: false 
+  #     - run:
+  #         name: Build using `docker-compose`
+  #         command: |
+  #           docker-compose build
+  #     - run:
+  #         name: Creating Network
+  #         command: |
+  #           docker network create proxy
+  #     - run:
+  #         name: Up docker compose
+  #         command: |
+  #           docker-compose up -d
+  #     - run:
+  #         name: Get docker name
+  #         command: |
+  #           docker-compose ps
+
+  #     - run:
+  #         name: Start container and verify it's working
+  #         command: |
+  #           set -x
+
+            
+  #           docker container run --network container:repo_api_1 \
+  #             docker.io/jwilder/dockerize \
+  #             -wait http://localhost:3001/api/version  \
+  #             -wait-retry-interval 2s \
+  #             -timeout 20s  
+
+  #     - run:
+
+  #         name: docker-compose down
+  #         command: docker-compose down
+
+  #     - run:
+  #         name: Build Docker image TAG
+  #         command: |
+  #           TAG="0.1.${CIRCLE_BUILD_NUM}"
+  #           docker build -t  ${VAR_PRIVATE_REGISTRY}/circleci-demo:$TAG .
+
+  #     - run:
+  #         name: Push Docker image
+  #         command: |
+  #           TAG="0.1.${CIRCLE_BUILD_NUM}"
+  #           docker push ${VAR_PRIVATE_REGISTRY}/circleci-demo:$TAG
+      # run tests!
+      #- run: yarn test
+ 
+  deploy_to_server:
+    machine:
+      image: ubuntu-2004:202010-01
+    steps:
+      - run:
+          name: Install OpenFortiVPN
+          command: |
+            sudo apt-get update
+            sudo apt install openfortivpn -y
+ #     - run: sudo apt-get install rsync
+#      - add_ssh_keys
+      - checkout
+      - run:
+          name: "Setting environment vars for test env"
+          command: |
+                    echo "export VPN_IP=${VAR_PRIVATE_VPN_IP}" >> ${BASH_ENV}
+                    echo "export VPN_USER=${VAR_PRIVATE_VPN_USER}" >> ${BASH_ENV}
+                    echo "export VPN_PORT=${VAR_PRIVATE_VPN_PORT}" >> ${BASH_ENV}
+                    echo "export VPN_PASS=${VAR_PRIVATE_VPN_PASSWORD}" >> ${BASH_ENV}
+      - run:
+          name: Check IP before VPN connection
+          command: |
+            chmod +x .circleci/script.sh
+            ./.circleci/script.sh
+            ping -c 9 $SSH_HOSTNAME
+   #        sudo openfortivpn ${VAR_PRIVATE_VPN_IP} -u ${VAR_PRIVATE_VPN_USER} --trusted-cert 1316d13a7122725ecc1d555895053bd1ae8b0c2159e04a1c7c39e4bfb72cbfae -p ${VAR_PRIVATE_VPN_PASSWORD}   > openfortivpn.log 2>&1
+      # Add the server to known hosts
+      - run:
+          name: Test ping for remote server
+          command: |
+            ping -c 4 $SSH_HOSTNAME
+      - run: 
+          name: Sync SSH keys
+          command: |
+            ssh-keyscan -H 10.0.13.10 >> ~/.ssh/known_hosts
+      - run:
+          name: RsyncProject test
+          command: |
+           rsync -avce ssh $SSH_USERNAME@$SSH_HOSTNAME:/home/$FIOLDER/apps/test
+#  #     - run:
+ #         name: Deploy to dev.
+ #         command: ssh $SSH_USERNAME@$SSH_HOSTNAME -o StrictHostKeyChecking=no "ls"
+ 
+
+
+
+ 
+workflows:
+  version: 2
+  build-test-and-deploy:
+    jobs:
+      #- build
+      # - make_build_docker:
+      #     requires:
+      #       - build
+      - deploy_to_server
+      #    requires:
+      #      - build
+      #- deploy_testing:
+      #    type: 
+      #      - approval
+      #    requires:
+      #      - build
+      #      - make_build_docker
+      #- deploy-production:
+      #    requires:
+      #     - deploy_testing

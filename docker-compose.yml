@@ -1,0 +1,40 @@
+
+version: "3.3"
+
+services:
+  api:
+    restart: "always"
+    build: .
+    #stdin_open: true
+    #tty: true
+    ports:
+      - "3001:3001"
+    #volumes:
+      #- .:/src/app
+      #- ./node_modules:/src/app/node_modules
+    networks:
+      - default
+      - proxy
+    environment:
+      WAIT_HOSTS: mongo:27017
+#  mongo:
+#    restart: "always"
+#    image: "mongo:4.2-bionic"
+    #command: bash -c "mongod --repair && mongod --dbpath /data/db"
+#    ports:
+#      - "27017:27017"
+#    volumes:
+      # Desarrollo
+      #- ./data:/data/db
+      # Producción
+#      - ./datadb/.api:/data/db
+
+volumes:
+  api:
+  mongo:
+
+
+networks:
+  default:
+  proxy:
+    external: true
