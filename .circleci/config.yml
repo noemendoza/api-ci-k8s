@@ -3,7 +3,11 @@
 # Test porpuses
 
 
-version: 2
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.0.2
+
 jobs:
   Test:
     docker:
@@ -26,68 +30,73 @@ jobs:
       - run: yarn test
  
   test_build_docker:
-    docker:
-      - image: circleci/node:10.24.1
     working_directory: ~/repo
+   # executor: docker/docker
     steps:
-      - checkout
-      - run:
-          name: Install `docker-compose`
-          command: |
-            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-            chmod +x ~/docker-compose
-            sudo mv ~/docker-compose /usr/local/bin/docker-compose
-      - setup_remote_docker:
-          docker_layer_caching: true
-      - run:
-          name: Build using `docker-compose`
-          command: |
-            docker-compose build
-      - run:
-          name: Creating Network
-          command: |
-            docker network create proxy
-      - run:
-          name: Up docker compose
-          command: |
-            docker-compose up -d
-      - run:
-          name: Get docker name
-          command: |
-            docker-compose ps
 
-      - run:
-          name: Start container and verify it's working
-          command: |
-            set -x
+      - checkout
+      - docker/publish:
+          image: developerrepo00/circleci-demo
+          tag: 'latest, $TAG '
+          deploy: true
+          registry: hub.cloud-services.mx
+
+
+   #   - docker/install-docker-compose
+
+    #  - setup_remote_docker:
+    #      docker_layer_caching: true
+      # - run:
+      #     name: Build using `docker-compose`
+      #     command: |
+      #       docker-compose build
+      # - run:
+      #     name: Creating Network
+      #     command: |
+      #       docker network create proxy
+      # - run:
+      #     name: Up docker compose
+      #     command: |
+      #       docker-compose up -d
+      # - run:
+      #     name: Get docker name
+      #     command: |
+      #       docker-compose ps
+
+      # - run:
+      #     name: Start container and verify it's working
+      #     command: |
+      #       set -x
 
             
-            docker container run --network container:repo_api_1 \
-              docker.io/jwilder/dockerize \
-              -wait http://localhost:3001/api/version  \
-              -wait-retry-interval 2s \
-              -timeout 20s  
+      #       docker container run --network container:repo_api_1 \
+      #         docker.io/jwilder/dockerize \
+      #         -wait http://localhost:3001/api/version  \
+      #         -wait-retry-interval 2s \
+      #         -timeout 20s  
 
-      - run:
+      # - run:
 
-          name: docker-compose down
-          command: docker-compose down
-      - run:
-          name: Docker Login
-          command: |
-            echo "${PASS_PRIVATE_REGISTRY}" | docker login ${URL_PRIVATE_REGISTRY}  --username ${USER_PRIVATE_REGISTRY} --password-stdin 
+      #     name: docker-compose down
+      #     command: docker-compose down
+     # - run:
+     #     name: Docker Login
+     #     command: |
+     #       echo "${PASS_PRIVATE_REGISTRY}" | docker login ${URL_PRIVATE_REGISTRY}  --username ${USER_PRIVATE_REGISTRY} --password-stdin 
+     # - docker/build:
+     #     image: developerrepo00/circleci-demo
 
-      - run:
-          name: Build Docker image TAG
-          command: |
-            TAG="0.1.${CIRCLE_BUILD_NUM}"
-            docker build -t $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG .
+      # - run:
+      #     name: Build Docker image TAG
+      #     command: |
+      #       TAG="0.1.${CIRCLE_BUILD_NUM}"
+      #       docker build -t $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG .
 
-      - run:
-          name: Push Docker image
-          command: |
-            TAG="0.1.${CIRCLE_BUILD_NUM}"
-            docker push $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG
+      # - run:
+      #     name: Push Docker image
+      #     command: |
+      #       TAG="0.1.${CIRCLE_BUILD_NUM}"
+      #       docker push $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG
       # run tests!
       #- run: yarn test
  
