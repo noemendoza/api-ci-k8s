@@ -79,11 +79,14 @@ jobs:
           command: |
             echo "${PASS_PRIVATE_REGISTRY}" | docker login ${URL_PRIVATE_REGISTRY}  --username ${USER_PRIVATE_REGISTRY} --password-stdin 
       - docker/build:
-          image: $VAR_PRIVATE_REGISTRY/circleci-demo
-          tag: 'lastest, $TAG '
+          image: developerrepo00/circleci-demo
+
+
+      - docker/publish:
+          image: developerrepo00/circleci-demo
+          tag: 'latest, $TAG '
           deploy: true
-
-
+          registry: hub.cloud-services.mx
       # - run:
       #     name: Build Docker image TAG
       #     command: |
