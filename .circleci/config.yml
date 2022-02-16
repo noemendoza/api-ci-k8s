@@ -31,14 +31,14 @@ jobs:
  
   test_build_docker:
     working_directory: ~/repo
-    executor: docker/docker
+   # executor: docker/docker
     steps:
 
       - checkout
-      - docker/install-docker-compose
+   #   - docker/install-docker-compose
 
-      - setup_remote_docker:
-          docker_layer_caching: true
+    #  - setup_remote_docker:
+    #      docker_layer_caching: true
       # - run:
       #     name: Build using `docker-compose`
       #     command: |
@@ -72,12 +72,12 @@ jobs:
 
       #     name: docker-compose down
       #     command: docker-compose down
-      - run:
-          name: Docker Login
-          command: |
-            echo "${PASS_PRIVATE_REGISTRY}" | docker login ${URL_PRIVATE_REGISTRY}  --username ${USER_PRIVATE_REGISTRY} --password-stdin 
-      - docker/build:
-          image: developerrepo00/circleci-demo
+     # - run:
+     #     name: Docker Login
+     #     command: |
+     #       echo "${PASS_PRIVATE_REGISTRY}" | docker login ${URL_PRIVATE_REGISTRY}  --username ${USER_PRIVATE_REGISTRY} --password-stdin 
+     # - docker/build:
+     #     image: developerrepo00/circleci-demo
 
 
       - docker/publish:
