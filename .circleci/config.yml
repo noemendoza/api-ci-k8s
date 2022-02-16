@@ -31,6 +31,9 @@ jobs:
  
   test_build_docker:
     working_directory: ~/repo
+    executor:
+      name: docker/docker
+      tag: '3.6'
     steps:
 
       - checkout
