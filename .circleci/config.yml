@@ -3,7 +3,11 @@
 # Test porpuses
 
 
-version: 2
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.0.2
+
 jobs:
   Test:
     docker:
@@ -26,17 +30,12 @@ jobs:
       - run: yarn test
  
   test_build_docker:
-    docker:
-      - image: circleci/node:10.24.1
     working_directory: ~/repo
     steps:
+
       - checkout
-      - run:
-          name: Install `docker-compose`
-          command: |
-            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-            chmod +x ~/docker-compose
-            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - docker/install-docker-tools
+
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
