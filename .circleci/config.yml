@@ -124,12 +124,9 @@ jobs:
       - run:
           name: Install YQ
           command: >
-            curl -L -o ${HOME}/yq
-            wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-
-            chmod a+x /usr/local/bin/yq
-
-            ${HOME}/yq --version
+            wget https://github.com/mikefarah/yq/releases/download/v4.20.1/yq_linux_amd64 -O /usr/bin/yq &&\
+            chmod +x /usr/bin/yq
+             yq --version
 
       - run:
           name: Update YML Chart.yml Dev
