@@ -1,40 +1,44 @@
 # Test CircleCI/ARGOCD/Harbor/HELM/K8S
 # Noe
 # Test porpuses
-
-
 version: 2.1
-workflows:
-  version: 2.1
-  Test-Build-Publish:
-    jobs:
-      - Test
-      #- build
-      - build_docker_publish:
-          requires:
-            - Test
-
-      #- deploy_testing:
-      #    type: 
-      #      - approval
-      #    requires:
-      #      - build
-      #      - make_build_docker
-      #- deploy-production:
-      #    requires:
-      #     - deploy_testing
 orbs:
   docker: circleci/docker@2.0.2
 
+
+
+build_always: &build_always
+  filters:
+    tags:
+      only: /^v.*/
+# Build only in master or in tags
+build_on_main_and_tags: &build_on_main_and_tags
+  filters:
+    tags:
+      only: /^v.*/
+    branches:
+      only: main
+
+workflows:
+  version: 2
+  circleci-demo:
+    jobs:
+      - test_yarn_packages:
+          <<: *build_always
+      - sync_chart:
+          <<: *build_on_master_and_tags
+          requires:
+            - build_and_push_images_prod
+
+
+
 jobs:
-  Test:
+  test_yarn_packages:
     docker:
       - image: circleci/node:10.24.1
     working_directory: ~/repo
-
     steps:
       - checkout
-    # Download and cache dependencies
       - restore_cache:
           keys:
             - dependencies-{{ checksum "package-lock.json" }}
@@ -46,8 +50,7 @@ jobs:
             - /root/.cache/Cypress
           key: dependencies-{{ checksum "package-lock.json" }}
       - run: yarn test
- 
-  build_docker_publish:
+  build_and_push_images_prod:
     working_directory: ~/repo
     executor:
       name: docker/docker
@@ -56,42 +59,8 @@ jobs:
 
       - checkout
       - docker/install-docker-compose
-
       - setup_remote_docker:
           docker_layer_caching: true
-      # - run:
-      #     name: Build using `docker-compose`
-      #     command: |
-      #       docker-compose build
-      # - run:
-      #     name: Creating Network
-      #     command: |
-      #       docker network create proxy
-      # - run:
-      #     name: Up docker compose
-      #     command: |
-      #       docker-compose up -d
-      # - run:
-      #     name: Get docker name
-      #     command: |
-      #       docker-compose ps
-
-      # - run:
-      #     name: Start container and verify it's working
-      #     command: |
-      #       set -x
-
-            
-      #       docker container run --network container:repo_api_1 \
-      #         docker.io/jwilder/dockerize \
-      #         -wait http://localhost:3001/api/version  \
-      #         -wait-retry-interval 2s \
-      #         -timeout 20s  
-
-      # - run:
-
-      #     name: docker-compose down
-      #     command: docker-compose down
       - run:
           name: Docker Login
           command: |
@@ -108,10 +77,12 @@ jobs:
           command: |
             TAG="0.1.${CIRCLE_BUILD_NUM}"
             docker push $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG
-      # run tests!
-      #- run: yarn test
- 
-
+  sync_chart:
+    docker:
+      - image: circleci/node:10.24.1
+    working_directory: ~/repo
+    steps:
+      - checkout
       - run:
           name: Install YQ
           command: |
@@ -164,6 +135,46 @@ jobs:
 
               helm plugin install https://github.com/chartmuseum/helm-push
               helm cm-push charts/api-ci-dev/ dircleci-demo
+jobs:
+  Test:
+
+ 
+
+      # - run:
+      #     name: Build using `docker-compose`
+      #     command: |
+      #       docker-compose build
+      # - run:
+      #     name: Creating Network
+      #     command: |
+      #       docker network create proxy
+      # - run:
+      #     name: Up docker compose
+      #     command: |
+      #       docker-compose up -d
+      # - run:
+      #     name: Get docker name
+      #     command: |
+      #       docker-compose ps
+
+      # - run:
+      #     name: Start container and verify it's working
+      #     command: |
+      #       set -x
+
+            
+      #       docker container run --network container:repo_api_1 \
+      #         docker.io/jwilder/dockerize \
+      #         -wait http://localhost:3001/api/version  \
+      #         -wait-retry-interval 2s \
+      #         -timeout 20s  
+
+      # - run:
+
+      #     name: docker-compose down
+      #     command: docker-compose down
+
+
 
   # deploy_to_server:
   #   machine:
