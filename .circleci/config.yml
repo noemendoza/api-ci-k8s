@@ -13,9 +13,9 @@ workflows:
       #- build_docker_publish:
       #    requires:
       #      - Test
-      - sync_repo_helm:
-          requires:
-            - Test
+      - sync_repo_helm
+      #    requires:
+       #     - Test
       #- deploy_testing:
       #    type: 
       #      - approval
@@ -25,93 +25,93 @@ workflows:
       #- deploy-production:
       #    requires:
       #     - deploy_testing
-# orbs:
-#   docker: circleci/docker@2.0.2
+orbs:
+  docker: circleci/docker@2.0.2
 
-# jobs:
-#   Test:
-#     docker:
-#       - image: circleci/node:10.24.1
-#     working_directory: ~/repo
+jobs:
+  Test:
+    docker:
+      - image: circleci/node:10.24.1
+    working_directory: ~/repo
 
-#     steps:
-#       - checkout
-#     # Download and cache dependencies
-#       - restore_cache:
-#           keys:
-#             - dependencies-{{ checksum "yarn.lock" }}
-#             - dependencies-
-#       - run: yarn install
-#       - save_cache:
-#           paths:
-#             - node_modules
-#             - /root/.cache/Cypress
-#           key: dependencies-{{ checksum "yarn.lock" }}
-#       - run: yarn test
+    steps:
+      - checkout
+    # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - dependencies-{{ checksum "yarn.lock" }}
+            - dependencies-
+      - run: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+            - /root/.cache/Cypress
+          key: dependencies-{{ checksum "yarn.lock" }}
+      - run: yarn test
  
-#   build_docker_publish:
-#     working_directory: ~/repo
-#     executor:
-#       name: docker/docker
-#       tag: '3.6'
-#     steps:
+  build_docker_publish:
+    working_directory: ~/repo
+    executor:
+      name: docker/docker
+      tag: '3.6'
+    steps:
 
-#       - checkout
-#       - docker/install-docker-compose
+      - checkout
+      - docker/install-docker-compose
 
-#       - setup_remote_docker:
-#           docker_layer_caching: true
-#       # - run:
-#       #     name: Build using `docker-compose`
-#       #     command: |
-#       #       docker-compose build
-#       # - run:
-#       #     name: Creating Network
-#       #     command: |
-#       #       docker network create proxy
-#       # - run:
-#       #     name: Up docker compose
-#       #     command: |
-#       #       docker-compose up -d
-#       # - run:
-#       #     name: Get docker name
-#       #     command: |
-#       #       docker-compose ps
+      - setup_remote_docker:
+          docker_layer_caching: true
+      # - run:
+      #     name: Build using `docker-compose`
+      #     command: |
+      #       docker-compose build
+      # - run:
+      #     name: Creating Network
+      #     command: |
+      #       docker network create proxy
+      # - run:
+      #     name: Up docker compose
+      #     command: |
+      #       docker-compose up -d
+      # - run:
+      #     name: Get docker name
+      #     command: |
+      #       docker-compose ps
 
-#       # - run:
-#       #     name: Start container and verify it's working
-#       #     command: |
-#       #       set -x
+      # - run:
+      #     name: Start container and verify it's working
+      #     command: |
+      #       set -x
 
             
-#       #       docker container run --network container:repo_api_1 \
-#       #         docker.io/jwilder/dockerize \
-#       #         -wait http://localhost:3001/api/version  \
-#       #         -wait-retry-interval 2s \
-#       #         -timeout 20s  
+      #       docker container run --network container:repo_api_1 \
+      #         docker.io/jwilder/dockerize \
+      #         -wait http://localhost:3001/api/version  \
+      #         -wait-retry-interval 2s \
+      #         -timeout 20s  
 
-#       # - run:
+      # - run:
 
-#       #     name: docker-compose down
-#       #     command: docker-compose down
-#       - run:
-#           name: Docker Login
-#           command: |
-#             echo "${PASS_PRIVATE_REGISTRY}" | docker login ${URL_PRIVATE_REGISTRY}  --username ${USER_PRIVATE_REGISTRY} --password-stdin 
+      #     name: docker-compose down
+      #     command: docker-compose down
+      - run:
+          name: Docker Login
+          command: |
+            echo "${PASS_PRIVATE_REGISTRY}" | docker login ${URL_PRIVATE_REGISTRY}  --username ${USER_PRIVATE_REGISTRY} --password-stdin 
 
-#       - run:
-#           name: Build Docker image TAG
-#           command: |
-#             TAG="0.1.${CIRCLE_BUILD_NUM}"
-#             docker build -t $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG .
+      - run:
+          name: Build Docker image TAG
+          command: |
+            TAG="0.1.${CIRCLE_BUILD_NUM}"
+            docker build -t $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG .
 
-#       - run:
-#           name: Push Docker image
-#           command: |
-#             TAG="0.1.${CIRCLE_BUILD_NUM}"
-#             docker push $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG
-#       # run tests!
-#       #- run: yarn test
+      - run:
+          name: Push Docker image
+          command: |
+            TAG="0.1.${CIRCLE_BUILD_NUM}"
+            docker push $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG
+      # run tests!
+      #- run: yarn test
  
 
   sync_repo_helm:
