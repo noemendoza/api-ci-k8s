@@ -22,6 +22,8 @@ workflows:
     jobs:
       - test_yarn_packages:
           <<: *build_always
+      - build_and_push_images_prod:
+          <<: *build_always
       - sync_chart:
           <<: *build_on_main_and_tags
           requires:
