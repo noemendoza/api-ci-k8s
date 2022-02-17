@@ -2,11 +2,8 @@
 # Noe
 # Test porpuses
 version: 2.1
-orbs:
-  docker: circleci/docker@2.0.2
 
-
-
+#Build Condition
 build_always: &build_always
   filters:
     tags:
@@ -30,6 +27,8 @@ workflows:
           requires:
             - build_and_push_images_prod
 
+orbs:
+  docker: circleci/docker@2.0.2
 
 
 jobs:
