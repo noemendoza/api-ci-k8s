@@ -196,7 +196,7 @@ jobs:
 workflows:
   Test-Build-Publish:
     jobs:
-      - Test:
+      - Test
       #- build
       - build_docker_publish:
           requires:
