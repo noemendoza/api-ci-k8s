@@ -10,7 +10,7 @@ workflows:
     jobs:
       - Test
       #- build
-      - build_docker_publish_sync:
+      - build_docker_publish:
           requires:
             - Test
 
