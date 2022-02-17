@@ -10,13 +10,10 @@ workflows:
     jobs:
       - Test
       #- build
-      - build_docker_publish:
+      - build_docker_publish_sync:
           requires:
             - Test
-      - sync_repo_helm:
-          requires:
-            - Test
-            - build_docker_publish
+
       #- deploy_testing:
       #    type: 
       #      - approval
@@ -40,14 +37,14 @@ jobs:
     # Download and cache dependencies
       - restore_cache:
           keys:
-            - dependencies-{{ checksum "yarn.lock" }}
+            - dependencies-{{ checksum "package-lock.json" }}
             - dependencies-
       - run: yarn install
       - save_cache:
           paths:
             - node_modules
             - /root/.cache/Cypress
-          key: dependencies-{{ checksum "yarn.lock" }}
+          key: dependencies-{{ checksum "package-lock.json" }}
       - run: yarn test
  
   build_docker_publish:
@@ -103,25 +100,18 @@ jobs:
       - run:
           name: Build Docker image TAG
           command: |
-            TAG="0.1.${CIRCLE_JOB}"
+            TAG="0.1.${CIRCLE_BUILD_NUM}"
             docker build -t $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG .
 
       - run:
           name: Push Docker image
           command: |
-            TAG="0.1.${CIRCLE_JOB}"
+            TAG="0.1.${CIRCLE_BUILD_NUM}"
             docker push $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG
       # run tests!
       #- run: yarn test
  
 
-  sync_repo_helm:
-    docker:
-      - image: circleci/node:10.24.1
-    working_directory: ~/repo
-
-    steps:
-      - checkout
       - run:
           name: Install YQ
           command: |
@@ -133,8 +123,8 @@ jobs:
           name: Update YML Chart.yml Dev
           command: |
             ls
-            TAG=0.1.${CIRCLE_JOB}
-            TAGHELM="0.1.${CIRCLE_JOB}"
+            TAG=0.1.${CIRCLE_BUILD_NUM}
+            TAGHELM="0.1.${CIRCLE_BUILD_NUM}"
             sed -i 's|^version:.*|version: '"$TAGHELM"'|g' charts/api-ci-dev/Chart.yaml
           
             yq -i '.description = "circleci-demo-'$TAG'"' charts/api-ci-dev/Chart.yaml
@@ -144,7 +134,7 @@ jobs:
       - run:
           name: Update YML values.yml Dev
           command: |
-            TAG="0.1.${CIRCLE_JOB}"
+            TAG="0.1.${CIRCLE_BUILD_NUM}"
             yq -i '.image.tag = "'$TAG'"' charts/api-ci-dev/values.yaml
             yq -i '.nameOverride = "circleci-demo-'$TAG'"' charts/api-ci-dev/values.yaml
             yq -i '.fullnameOverride = "circleci-demo-'$TAG'"' charts/api-ci-dev/values.yaml
