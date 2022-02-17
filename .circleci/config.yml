@@ -8,14 +8,14 @@ workflows:
   version: 2.1
   Test-Build-Publish:
     jobs:
-      #- Test
+      - Test
       #- build
-      #- build_docker_publish:
-      #    requires:
-      #      - Test
-      - sync_repo_helm
-      #    requires:
-       #     - Test
+      - build_docker_publish:
+          requires:
+            - Test
+      - sync_repo_helm:
+          requires:
+            - Test
       #- deploy_testing:
       #    type: 
       #      - approval
