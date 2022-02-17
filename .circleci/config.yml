@@ -133,7 +133,7 @@ jobs:
           command: |
             ls
             TAG="0.1.${CIRCLE_BUILD_NUM}"
-            yq -i '.version = $TAG' charts/api-ci-dev/Chart.yaml
+            yq -i '.version = "$TAG"' charts/api-ci-dev/Chart.yaml
             yq -i '.description = "circleci-demo-$TAG"' charts/api-ci-dev/Chart.yaml
             yq -i '.appVersion = "$TAG"' charts/api-ci-dev/Chart.yaml
             yq -i '.name = "circleci-demo"' charts/api-ci-dev/Chart.yaml
