@@ -160,6 +160,7 @@ jobs:
       - run:
           name: Test Chart lint
           command: |
+            cat charts/api-ci-dev/Chart.yaml
              helm lint charts/api-ci-dev/
 
       - run:
