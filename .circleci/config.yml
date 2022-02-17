@@ -139,14 +139,12 @@ workflows:
       - Test
           filters:
             branches:
-              only:
-                - main
+              only: main
       #- build
       - build_docker_publish:
           filters:
             branches:
-              only:
-                - main
+              only: main
           requires:
             - Test
       #- deploy_to_server
