@@ -8,7 +8,7 @@ build_always: &build_always
   filters:
     tags:
       only: /^v.*/
-# Build only in master or in tags
+# Build only in main or in tags
 build_on_main_and_tags: &build_on_main_and_tags
   filters:
     tags:
@@ -134,10 +134,6 @@ jobs:
 
               helm plugin install https://github.com/chartmuseum/helm-push
               helm cm-push charts/api-ci-dev/ dircleci-demo
-jobs:
-  Test:
-
- 
 
       # - run:
       #     name: Build using `docker-compose`
