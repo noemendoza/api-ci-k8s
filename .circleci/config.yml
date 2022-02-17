@@ -5,6 +5,7 @@
 
 version: 2.1
 workflows:
+  version: 2.1
   Test-Build-Publish:
     jobs:
       - Test
@@ -124,10 +125,9 @@ jobs:
           name: Install YQ
           command: >
             curl -L -o ${HOME}/yq
-            https://github.com/mikefarah/yq/releases/download/<< parameters.version
-            >>/yq_linux_amd64
+            wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
 
-            chmod +x ${HOME}/yq
+            chmod a+x /usr/local/bin/yq
 
             ${HOME}/yq --version
 
