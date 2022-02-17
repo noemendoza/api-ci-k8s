@@ -6,7 +6,7 @@ image:
   repository: hub.cloud-services.mx/developerrepo00/circleci-demo
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "eee"
+  tag: "$TAG"
 imagePullSecrets:
   - name: cloudservices
 nameOverride: "sinpintosd"
