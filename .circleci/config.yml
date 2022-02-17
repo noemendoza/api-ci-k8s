@@ -16,6 +16,7 @@ workflows:
       - sync_repo_helm:
           requires:
             - Test
+            - build_docker_publish
       #- deploy_testing:
       #    type: 
       #      - approval
@@ -102,13 +103,13 @@ jobs:
       - run:
           name: Build Docker image TAG
           command: |
-            TAG="0.1.${CIRCLE_BUILD_NUM}"
+            TAG="0.1.${CIRCLE_BRANCH}"
             docker build -t $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG .
 
       - run:
           name: Push Docker image
           command: |
-            TAG="0.1.${CIRCLE_BUILD_NUM}"
+            TAG="0.1.${CIRCLE_BRANCH}"
             docker push $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG
       # run tests!
       #- run: yarn test
@@ -132,8 +133,9 @@ jobs:
           name: Update YML Chart.yml Dev
           command: |
             ls
-            TAG=0.1.${CIRCLE_BUILD_NUM}
-            sed -i 's|^version:.*|version: '"$TAG"'|g' charts/api-ci-dev/Chart.yaml
+            TAG=0.1.${CIRCLE_BRANCH}
+            TAGHELM="0.1.${CIRCLE_BUILD_NUM}"
+            sed -i 's|^version:.*|version: '"$TAGHELM"'|g' charts/api-ci-dev/Chart.yaml
           
             yq -i '.description = "circleci-demo-'$TAG'"' charts/api-ci-dev/Chart.yaml
             yq -i '.appVersion = "'$TAG'"' charts/api-ci-dev/Chart.yaml  
@@ -142,7 +144,7 @@ jobs:
       - run:
           name: Update YML values.yml Dev
           command: |
-            TAG="0.1.${CIRCLE_BUILD_NUM}"
+            TAG="0.1.${CIRCLE_BRANCH}"
             yq -i '.image.tag = "'$TAG'"' charts/api-ci-dev/values.yaml
             yq -i '.nameOverride = "circleci-demo-'$TAG'"' charts/api-ci-dev/values.yaml
             yq -i '.fullnameOverride = "circleci-demo-'$TAG'"' charts/api-ci-dev/values.yaml

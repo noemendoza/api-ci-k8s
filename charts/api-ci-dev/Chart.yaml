@@ -3,5 +3,5 @@ name: "circleci-demo"
 description: circleci-demo-1.103
 icon: https://www.clipartmax.com/png/middle/307-3072095_discord-icon-by-rengatv-cool-server-icons-discord.png
 type: application
-version: 1.0.1
+version: ea718b8
 appVersion: "1.103"
