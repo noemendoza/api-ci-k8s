@@ -204,7 +204,7 @@ workflows:
             - Test
       - sync_repo_helm:
           requires:
-            - build
+            - Test
       #- deploy_testing:
       #    type: 
       #      - approval
