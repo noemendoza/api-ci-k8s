@@ -136,8 +136,8 @@ jobs:
           command: |
             TAG="0.1.${CIRCLE_BUILD_NUM}"
             yq -i '.image.tag = "'$TAG'"' charts/api-ci-dev/values.yaml
-            yq -i '.nameOverride = "circleci-demo-'$TAG | sed "s/\./-/g'"' charts/api-ci-dev/values.yaml
-            yq -i '.fullnameOverride = "circleci-demo-'$TAG | sed "s/\./-/g'"' charts/api-ci-dev/values.yaml
+            yq -i '.nameOverride = "circleci-demo-'echo $TAG | sed "s/\./-/g'"' charts/api-ci-dev/values.yaml
+            yq -i '.fullnameOverride = "circleci-demo-'echo$TAG | sed "s/\./-/g'"' charts/api-ci-dev/values.yaml
             yq -i '.ingress.hosts[0].paths[0].path =  "/'$TAG'"' charts/api-ci-dev/values.yaml
             yq -i '.ingress.hosts[0].paths[0].backend.serviceName =  "circleci-demo-ingress-'$TAG'"' charts/api-ci-dev/values.yaml
 
