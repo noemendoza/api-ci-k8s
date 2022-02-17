@@ -29,7 +29,7 @@ jobs:
           key: dependencies-{{ checksum "yarn.lock" }}
       - run: yarn test
  
-  test_build_docker:
+  build_docker_publish:
     working_directory: ~/repo
     executor:
       name: docker/docker
@@ -137,8 +137,16 @@ workflows:
   Test-Build-Publish:
     jobs:
       - Test
+          filters:
+            branches:
+              only:
+                - main
       #- build
-      - test_build_docker:
+      - build_docker_publish:
+          filters:
+            branches:
+              only:
+                - main
           requires:
             - Test
       #- deploy_to_server
