@@ -93,6 +93,67 @@ jobs:
       # run tests!
       #- run: yarn test
  
+
+  sync_repo_helm:
+    docker:
+      - image: circleci/node:10.24.1
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+      - run:
+          name: Install YQ
+          command: >
+            curl -L -o ${HOME}/yq
+            https://github.com/mikefarah/yq/releases/download/<< parameters.version
+            >>/yq_linux_amd64
+
+            chmod +x ${HOME}/yq
+
+            ${HOME}/yq --version
+
+      - run:
+          name: Update YML Chart.yml Dev
+          command: |
+            TAG="0.1.${CIRCLE_BUILD_NUM}"
+            yq -i '.version = $TAG' api-ci-dev/Chart.yaml
+            yq -i '.description = circleci-demo-$TAG' api-ci-dev/Chart.yaml
+            yq -i '.appVersion = "$TAG"' api-ci-dev/Chart.yaml
+            yq -i '.name = "circleci-demo"' api-ci-dev/Chart.yaml
+
+      - run:
+          name: Update YML values.yml Dev
+          command: |
+            TAG="0.1.${CIRCLE_BUILD_NUM}"
+            yq -i '.image.tag = "$TAG"' api-ci-dev/values.yaml
+            yq -i '.nameOverride = "circleci-demo"' api-ci-dev/values.yaml
+            yq -i '.fullnameOverride = "circleci-demo"' api-ci-dev/values.yaml
+            yq -i '.ingress.hosts[0].paths[0].path =  "/$TAG"' api-ci-dev/values.yaml
+            yq -i '.ingress.hosts[0].paths[0].backend.serviceName =  "circleci-demo-ingress-$TAG"' api-ci-dev/values.yaml
+
+      - run:
+          name: Install Helm
+          command: |
+            curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+            chmod 700 get_helm.sh
+            ./get_helm.sh
+            helm version
+
+
+      - run:
+          name: Test Chart lint
+          command: |
+             helm lint api-ci-dev/
+
+      - run:
+          name: Helm add remote repo and publish
+          command: |
+              
+              helm repo add dircleci-demo --username ${USER_PRIVATE_REGISTRY} --password ${PASS_PRIVATE_REGISTRY} ${URL_PRIVATE_HELM}
+
+              helm plugin install https://github.com/chartmuseum/helm-push
+              helm cm-push ./api-ci-dev/ dircleci-demo
+
   # deploy_to_server:
   #   machine:
   #     image: ubuntu-2004:202010-01
@@ -137,19 +198,13 @@ workflows:
   Test-Build-Publish:
     jobs:
       - Test
-          filters:
-            branches:
-              only: main
       #- build
       - build_docker_publish:
-          filters:
-            branches:
-              only: main
           requires:
             - Test
-      #- deploy_to_server
-      #    requires:
-      #      - build
+      - sync_repo_helm:
+          requires:
+            - build
       #- deploy_testing:
       #    type: 
       #      - approval
