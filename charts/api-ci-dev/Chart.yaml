@@ -1,7 +1,7 @@
 apiVersion: v2
 name: "circleci-demo"
-description: circleci-demo-00000
+description: circleci-demo-1.1111
 icon: https://www.clipartmax.com/png/middle/307-3072095_discord-icon-by-rengatv-cool-server-icons-discord.png
 type: application
-version: 00000
-appVersion: "00000"
+version: 1.1111
+appVersion: "1.1111"
