@@ -4,4 +4,4 @@ description: circleci-demo-00000
 icon: https://www.clipartmax.com/png/middle/307-3072095_discord-icon-by-rengatv-cool-server-icons-discord.png
 type: application
 version: 00000
-appVersion: "$TAG"
+appVersion: "00000"

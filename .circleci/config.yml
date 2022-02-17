@@ -136,14 +136,14 @@ jobs:
             yq -i '.version = '$TAG'' charts/api-ci-dev/Chart.yaml
           
             yq -i '.description = "circleci-demo-'$TAG'"' charts/api-ci-dev/Chart.yaml
-            yq -i '.appVersion = strenv(TAG)' charts/api-ci-dev/Chart.yaml
+            yq -i '.appVersion = "'$TAG'"' charts/api-ci-dev/Chart.yaml  
             yq -i '.name = "circleci-demo"' charts/api-ci-dev/Chart.yaml
 
       - run:
           name: Update YML values.yml Dev
           command: |
             TAG="0.1.${CIRCLE_BUILD_NUM}"
-            yq -i '.image.tag = strenv($TAG' charts/api-ci-dev/values.yaml
+            yq -i '.image.tag = "'$TAG'"' charts/api-ci-dev/values.yaml
             yq -i '.nameOverride = "circleci-demo"' charts/api-ci-dev/values.yaml
             yq -i '.fullnameOverride = "circleci-demo"' charts/api-ci-dev/values.yaml
             yq -i '.ingress.hosts[0].paths[0].path =  "/'$TAG'"' charts/api-ci-dev/values.yaml
