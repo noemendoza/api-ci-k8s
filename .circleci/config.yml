@@ -160,7 +160,7 @@ jobs:
       - run:
           name: Test Chart lint
           command: |
-             helm lint api-ci-dev/
+             helm lint charts/api-ci-dev/
 
       - run:
           name: Helm add remote repo and publish
@@ -169,7 +169,7 @@ jobs:
               helm repo add dircleci-demo --username ${USER_PRIVATE_REGISTRY} --password ${PASS_PRIVATE_REGISTRY} ${URL_PRIVATE_HELM}
 
               helm plugin install https://github.com/chartmuseum/helm-push
-              helm cm-push ./api-ci-dev/ dircleci-demo
+              helm cm-push charts/api-ci-dev/ dircleci-demo
 
   # deploy_to_server:
   #   machine:
