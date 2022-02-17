@@ -133,8 +133,9 @@ jobs:
           command: |
             ls
             TAG="0.1.${CIRCLE_BUILD_NUM}"
-            yq -i '.version = strenv(TAG)' charts/api-ci-dev/Chart.yaml          
-            yq -i '.description = circleci-demo-strenv(TAG)' charts/api-ci-dev/Chart.yaml
+            yq -i '.version = '$TAG'' charts/api-ci-dev/Chart.yaml
+          
+            yq -i '.description = "circleci-demo-'$TAG'' charts/api-ci-dev/Chart.yaml
             yq -i '.appVersion = strenv(TAG)' charts/api-ci-dev/Chart.yaml
             yq -i '.name = "circleci-demo"' charts/api-ci-dev/Chart.yaml
 
@@ -142,11 +143,11 @@ jobs:
           name: Update YML values.yml Dev
           command: |
             TAG="0.1.${CIRCLE_BUILD_NUM}"
-            yq -i '.image.tag = strenv(TAG)' charts/api-ci-dev/values.yaml
+            yq -i '.image.tag = strenv($TAG' charts/api-ci-dev/values.yaml
             yq -i '.nameOverride = "circleci-demo"' charts/api-ci-dev/values.yaml
             yq -i '.fullnameOverride = "circleci-demo"' charts/api-ci-dev/values.yaml
-            yq -i '.ingress.hosts[0].paths[0].path =  /strenv(TAG)' charts/api-ci-dev/values.yaml
-            yq -i '.ingress.hosts[0].paths[0].backend.serviceName =  circleci-demo-ingress-strenv(TAG)' charts/api-ci-dev/values.yaml
+            yq -i '.ingress.hosts[0].paths[0].path =  "/'$TAG'"' charts/api-ci-dev/values.yaml
+            yq -i '.ingress.hosts[0].paths[0].backend.serviceName =  "circleci-demo-ingress-'$TAG'"' charts/api-ci-dev/values.yaml
 
       - run:
           name: Install Helm
