@@ -194,6 +194,7 @@ jobs:
 
  
 workflows:
+  version: 2.1
   Test-Build-Publish:
     jobs:
       - Test
