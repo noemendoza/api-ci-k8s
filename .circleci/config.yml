@@ -70,13 +70,13 @@ jobs:
       - run:
           name: Build Docker image TAG
           command: |
-            TAG="0.1.,<< pipeline.number >>"
+            TAG="0.1.<< pipeline.number >>"
             docker build -t $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG .
 
       - run:
           name: Push Docker image
           command: |
-            TAG="0.1.,<< pipeline.number >>"
+            TAG="0.1.<< pipeline.number >>"
             docker push $VAR_PRIVATE_REGISTRY/circleci-demo:$TAG
   sync_chart:
     docker:
@@ -95,8 +95,8 @@ jobs:
           name: Update YML Chart.yml Dev
           command: |
             ls
-            TAG=0.1.,<< pipeline.number >>
-            TAGHELM="0.1.,<< pipeline.number >>"
+            TAG=0.1.<< pipeline.number >>
+            TAGHELM="0.1.<< pipeline.number >>"
             sed -i 's|^version:.*|version: '"$TAGHELM"'|g' charts/api-ci-dev/Chart.yaml
           
             yq -i '.description = "circleci-demo-'$TAG'"' charts/api-ci-dev/Chart.yaml
@@ -106,7 +106,7 @@ jobs:
       - run:
           name: Update YML values.yml Dev
           command: |
-            TAG="0.1.,<< pipeline.number >>"
+            TAG="0.1.<< pipeline.number >>"
             yq -i '.image.tag = "'$TAG'"' charts/api-ci-dev/values.yaml
             yq -i '.nameOverride = "circleci-demo"' charts/api-ci-dev/values.yaml
             yq -i '.fullnameOverride = "circleci-demo"' charts/api-ci-dev/values.yaml
