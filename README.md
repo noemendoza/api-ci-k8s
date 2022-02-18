@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/noemendoza/api-ci-k8s/tree/main.svg?style=svg)](https://circleci.com/gh/noemendoza/api-ci-k8s/tree/main)
+
 Testing Porpuses
 
 -Cloud
