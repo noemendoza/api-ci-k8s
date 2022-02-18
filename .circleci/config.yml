@@ -161,7 +161,7 @@ jobs:
       - run:
           name: ArgoCD set new helm version
           command: |
-            argocd app set circleci-demo --revision "0.1.<< pipeline.number >>""   --grpc-web
+            argocd app set circleci-demo --revision "0.1.<< pipeline.number >>" --grpc-web
 
       - run:
           name: ArgoCD Sync Ne revision
