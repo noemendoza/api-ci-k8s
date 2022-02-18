@@ -1,6 +1,6 @@
 {
   "name": "api-ci",
-  "version": "1.0.71",
+  "version": "1.0.72",
   "description": "API REST ",
   "main": "app.js",
   "repository": "",
@@ -9,7 +9,7 @@
   "author": "Noe",
   "scripts": {
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 0",
+    "test": "echo \"Error: no test specified\" && exit 0g",
     "lint": "eslint .",
     "start:prod": "NODE_ENV=production PORT=3001 DBHOST=mongo:27017 node app.js"
   },
