@@ -110,7 +110,7 @@ jobs:
             yq -i '.image.tag = "'$TAG'"' charts/api-ci-dev/values.yaml
             yq -i '.nameOverride = "circleci-demo"' charts/api-ci-dev/values.yaml
             yq -i '.fullnameOverride = "circleci-demo"' charts/api-ci-dev/values.yaml
-            yq -i '.ingress.hosts[0].paths[0].path =  "/'$TAG'"' charts/api-ci-dev/values.yaml
+            yq -i '.ingress.hosts[0].paths[0].path =  "/'$TAG'(/|$)(.*)"' charts/api-ci-dev/values.yaml
             yq -i '.ingress.hosts[0].paths[0].backend.serviceName =  "circleci-demo-ingress-'$TAG'"' charts/api-ci-dev/values.yaml
 
       - run:
