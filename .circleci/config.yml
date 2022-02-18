@@ -28,6 +28,11 @@ workflows:
           <<: *build_on_main
           requires:
             - build_and_push_images_prod
+      - sync_argocd_prod:
+          <<: *build_on_main
+          requires:
+            - build_and_push_images_prod
+            - sync_chart
 
 orbs:
   docker: circleci/docker@2.0.2
@@ -137,6 +142,33 @@ jobs:
 
               helm plugin install https://github.com/chartmuseum/helm-push
               helm cm-push charts/api-ci-dev/ dircleci-demo
+  sync_chart:
+    docker:
+      - image: circleci/node:10.24.1
+    working_directory: ~/repo
+    steps:
+      - run:
+          name: Install ArgoCD-CLI
+          command: |
+            sudo curl -sSL -o /usr/local/bin/argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+            chmod +x /usr/local/bin/argocd
+            argocd version 
+      - run:
+          name: Login ArgoCD
+          command: |
+            argocd login ${ARGO_URL}  --username ${ARGO_USER} --grpc-web --password "${ARGO_PWD}"
+
+      - run:
+          name: ArgoCD set new helm version
+          command: |
+            argocd app set circleci-demo --revision "0.1.<< pipeline.number >>""   --grpc-web
+
+      - run:
+          name: ArgoCD Sync Ne revision
+          command: |
+            argocd app circleci-demo --grpc-web
+
+
 
       # - run:
       #     name: Build using `docker-compose`
