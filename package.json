@@ -1,6 +1,6 @@
 {
   "name": "api-ci",
-  "version": "1.0.73",
+  "version": "1.0.74",
   "description": "API REST ",
   "main": "app.js",
   "repository": "",
