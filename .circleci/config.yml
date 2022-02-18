@@ -166,7 +166,7 @@ jobs:
       - run:
           name: ArgoCD Sync Ne revision
           command: |
-            argocd app circleci-demo --grpc-web
+            argocd app sync circleci-demo --grpc-web
 
 
 
