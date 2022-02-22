@@ -163,10 +163,10 @@ jobs:
           command: |
             argocd app set circleci-demo --revision "0.1.<< pipeline.number >>" --grpc-web
 
-      - run:
-          name: ArgoCD Sync Ne revision
-          command: |
-            argocd app sync circleci-demo --grpc-web
+    #  - run:
+    #      name: ArgoCD Sync Ne revision
+    #      command: |
+    #        argocd app sync circleci-demo --grpc-web
 
 
 
