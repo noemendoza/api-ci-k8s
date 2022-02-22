@@ -1,5 +1,8 @@
 [![CircleCI](https://circleci.com/gh/noemendoza/api-ci-k8s/tree/main.svg?style=svg)](https://circleci.com/gh/noemendoza/api-ci-k8s/tree/main)
 
+
+![healthy and synced](https://argo.cloud-services.mx/api/badge?name=circleci-demo)
+
 Testing Porpuses
 
 -Cloud
